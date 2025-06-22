@@ -117,4 +117,67 @@ app.post('/generate-excel-devolucion', async (req, res) => {
     res.end();
 });
 
+// Ruta para mostrar formulario de devolución
+app.get('/devolucion', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'devolucion.html'));
+});
+
+// Generar y enviar Excel para devolución
+app.post('/generate-excel-devolucion', async (req, res) => {
+    const data = req.body;
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(
+        path.join(__dirname, 'public', 'templates', 'templateD.xlsx')
+    );
+    const sheet = workbook.getWorksheet(1);
+
+    // Rellenar celdas (igual a entrega, sin "utilización de equipo")
+    sheet.getCell('D7').value = data.nombreEquipo;
+    const tipos = {
+        pc: 'C10', celular: 'C12', monitor: 'C14', uniformes: 'C16',
+        notebook: 'H10', raton: 'H12', mochila: 'H14', otros: 'H16'
+    };
+    sheet.getCell(tipos[data.tipoEquipo]).value = 'X';
+
+    sheet.getCell('B20').value = data.colaborador.nombre;
+    sheet.getCell('B22').value = data.colaborador.area;
+    sheet.getCell('B24').value = data.colaborador.cargo;
+    sheet.getCell('B26').value = data.colaborador.correo;
+
+    sheet.getCell('I20').value = new Date().toLocaleDateString('es-CL');
+
+    // Campos técnicos y comentarios
+    sheet.getCell('B33').value = data.marca;
+    sheet.getCell('B35').value = data.modelo;
+    sheet.getCell('B37').value = data.serie;
+    sheet.getCell('B39').value = data.hostname;
+    sheet.getCell('B41').value = data.imei;
+    sheet.getCell('B43').value = data.otrosDetalle;
+    sheet.getCell('F34').value = data.estadoEquipo;
+    sheet.getCell('F38').value = data.comentarios;
+    sheet.getCell('B48').value = data.elementosAdicionales;
+
+    res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+        'Content-Disposition',
+        'attachment; filename=acta_devolucion.xlsx'
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+});
+
+// Ruta principal: menú
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Ruta para mostrar formulario de entrega
+app.get('/entrega', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'entrega.html'));
+});
+
 app.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
