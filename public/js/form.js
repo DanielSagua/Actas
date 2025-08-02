@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const arr = await res.json();
         list.innerHTML = arr.map(c => `
       <button type="button" class="list-group-item list-group-item-action"
-              data-id="${c.id}" data-area="${c.area}"
+              data-id_usuario="${c.id_usuario}" data-area="${c.area}"
               data-cargo="${c.cargo}" data-correo="${c.correo}">
         ${c.nombre}
       </button>
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     list.addEventListener('click', e => {
         if (e.target.matches('button')) {
             selectedColaborador = {
-                id: e.target.dataset.id,
+                id_usuario: e.target.dataset.id_usuario,
                 nombre: e.target.textContent,
                 area: e.target.dataset.area,
                 cargo: e.target.dataset.cargo,
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', async e => {
         e.preventDefault();
-        if (!selectedColaborador.id) {
+        if (!selectedColaborador.id_usuario) {
             return alert('Seleccione un colaborador válido');
         }
 

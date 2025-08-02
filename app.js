@@ -17,7 +17,7 @@ app.get('/api/colaboradores', async (req, res) => {
     const pool = await getPool();
     const result = await pool.request()
         .input('q', sql.NVarChar, `%${q}%`)
-        .query('SELECT id, nombre, area, cargo, correo FROM Colaboradores WHERE nombre LIKE @q');
+        .query('SELECT id_usuario, nombre, area, cargo, correo FROM Usuarios WHERE nombre LIKE @q');
     res.json(result.recordset);
 });
 
